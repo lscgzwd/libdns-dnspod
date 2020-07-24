@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"dnspod"
 	"fmt"
 	"os"
 	"time"
+
+	dnspod "github.com/lscgzwd/libdns-dnspod"
 
 	"github.com/libdns/libdns"
 )
