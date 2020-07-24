@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -42,6 +43,7 @@ func (p *Provider) getDomainIDByDomainName(domainName string) (string, error) {
 	if nil != err {
 		return "", err
 	}
+	domainName = strings.Trim(domainName, ".")
 	for _, domain := range domains {
 		if domain.Name == domainName {
 			return string(domain.ID), nil
