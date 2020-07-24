@@ -61,12 +61,15 @@ func (p *Provider) getDNSEntries(ctx context.Context, zone string) ([]libdns.Rec
 	var records []libdns.Record
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
-		return records, err
+		//debug
+		fmt.Printf("%s, %s", zone, err.Error())
+		return records, fmt.Errorf("Get records err.Zone:%s, Error:%s", zone, err.Error())
 	}
 	//todo now can only return 100 records
 	reqRecords, _, err := p.client.Records.List(string(domainID), "")
 	if err != nil {
-		return records, err
+		fmt.Printf("%s, %s", zone, err.Error())
+		return records, fmt.Errorf("Get records err.Zone:%s, Error:%s", zone, err.Error())
 	}
 
 	for _, entry := range reqRecords {
@@ -99,11 +102,13 @@ func (p *Provider) addDNSEntry(ctx context.Context, zone string, record libdns.R
 	}
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
-		return record, err
+		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Create record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
 	}
 	rec, _, err := p.client.Records.Create(domainID, entry)
 	if err != nil {
-		return record, err
+		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Create record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
 	}
 	record.ID = rec.ID
 
@@ -118,11 +123,13 @@ func (p *Provider) removeDNSEntry(ctx context.Context, zone string, record libdn
 
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
-		return record, err
+		fmt.Printf("%s, %s, %s, %s, %v", zone, record.Name, record.Value, err.Error(), record)
+		return record, fmt.Errorf("Remove record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, record.Name, record.Value, err.Error())
 	}
 	_, err = p.client.Records.Delete(domainID, record.ID)
 	if err != nil {
-		return record, err
+		fmt.Printf("%s, %s, %s, %s, %v", zone, record.Name, record.Value, err.Error(), record)
+		return record, fmt.Errorf("Remove record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, record.Name, record.Value, err.Error())
 	}
 
 	return record, nil
@@ -143,11 +150,13 @@ func (p *Provider) updateDNSEntry(ctx context.Context, zone string, record libdn
 	}
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
-		return record, err
+		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Update record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
 	}
 	_, _, err = p.client.Records.Update(domainID, record.ID, entry)
 	if err != nil {
-		return record, err
+		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Update record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
 	}
 
 	return record, nil
