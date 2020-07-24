@@ -62,20 +62,20 @@ func (p *Provider) getDNSEntries(ctx context.Context, zone string) ([]libdns.Rec
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
 		//debug
-		fmt.Printf("%s, %s", zone, err.Error())
+		// fmt.Printf("%s, %s", zone, err.Error())
 		return records, fmt.Errorf("Get records err.Zone:%s, Error:%s", zone, err.Error())
 	}
 	//todo now can only return 100 records
 	reqRecords, _, err := p.client.Records.List(string(domainID), "")
 	if err != nil {
-		fmt.Printf("%s, %s", zone, err.Error())
+		// fmt.Printf("%s, %s", zone, err.Error())
 		return records, fmt.Errorf("Get records err.Zone:%s, Error:%s", zone, err.Error())
 	}
 
 	for _, entry := range reqRecords {
 		ttl, _ := strconv.ParseInt(entry.TTL, 10, 64)
 		record := libdns.Record{
-			Name:  entry.Name,
+			Name:  entry.Name + "." + strings.Trim(zone, ".") + ".",
 			Value: entry.Value,
 			Type:  entry.Type,
 			TTL:   time.Duration(ttl) * time.Second,
@@ -94,7 +94,7 @@ func (p *Provider) addDNSEntry(ctx context.Context, zone string, record libdns.R
 	p.getClient()
 
 	entry := d.Record{
-		Name:  record.Name,
+		Name:  strings.Trim(strings.Trim(record.Name, zone), "."),
 		Value: record.Value,
 		Type:  record.Type,
 		Line:  "默认",
@@ -102,13 +102,13 @@ func (p *Provider) addDNSEntry(ctx context.Context, zone string, record libdns.R
 	}
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
-		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
-		return record, fmt.Errorf("Create record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
+		// fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Create record err.Zone:%s, Name: %s, Value: %s, Error:%s, %v", zone, entry.Name, entry.Value, err.Error(), record)
 	}
 	rec, _, err := p.client.Records.Create(domainID, entry)
 	if err != nil {
-		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
-		return record, fmt.Errorf("Create record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
+		// fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Create record err.Zone:%s, Name: %s, Value: %s, Error:%s, %v", zone, entry.Name, entry.Value, err.Error(), record)
 	}
 	record.ID = rec.ID
 
@@ -123,12 +123,12 @@ func (p *Provider) removeDNSEntry(ctx context.Context, zone string, record libdn
 
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
-		fmt.Printf("%s, %s, %s, %s, %v", zone, record.Name, record.Value, err.Error(), record)
+		// fmt.Printf("%s, %s, %s, %s, %v", zone, record.Name, record.Value, err.Error(), record)
 		return record, fmt.Errorf("Remove record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, record.Name, record.Value, err.Error())
 	}
 	_, err = p.client.Records.Delete(domainID, record.ID)
 	if err != nil {
-		fmt.Printf("%s, %s, %s, %s, %v", zone, record.Name, record.Value, err.Error(), record)
+		// fmt.Printf("%s, %s, %s, %s, %v", zone, record.Name, record.Value, err.Error(), record)
 		return record, fmt.Errorf("Remove record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, record.Name, record.Value, err.Error())
 	}
 
@@ -142,7 +142,7 @@ func (p *Provider) updateDNSEntry(ctx context.Context, zone string, record libdn
 	p.getClient()
 
 	entry := d.Record{
-		Name:  record.Name,
+		Name:  strings.Trim(strings.Trim(record.Name, zone), "."),
 		Value: record.Value,
 		Type:  record.Type,
 		Line:  "默认",
@@ -150,13 +150,13 @@ func (p *Provider) updateDNSEntry(ctx context.Context, zone string, record libdn
 	}
 	domainID, err := p.getDomainIDByDomainName(zone)
 	if nil != err {
-		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
-		return record, fmt.Errorf("Update record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
+		// fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Update record err.Zone:%s, Name: %s, Value: %s, Error:%s, %v", zone, entry.Name, entry.Value, err.Error(), record)
 	}
 	_, _, err = p.client.Records.Update(domainID, record.ID, entry)
 	if err != nil {
-		fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
-		return record, fmt.Errorf("Update record err.Zone:%s, Name: %s, Value: %s, Error:%s", zone, entry.Name, entry.Value, err.Error())
+		// fmt.Printf("%s, %s, %s, %s, %v", zone, entry.Name, entry.Value, err.Error(), record)
+		return record, fmt.Errorf("Update record err.Zone:%s, Name: %s, Value: %s, Error:%s, %v", zone, entry.Name, entry.Value, err.Error(), record)
 	}
 
 	return record, nil
