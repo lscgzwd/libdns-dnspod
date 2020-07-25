@@ -1,5 +1,7 @@
 # DNSPOD for `libdns`
 
+This project is archived, please go to https://github.com/libdns/dnspod
+
 [![godoc reference](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/libdns/dnspod)
 
 This package implements the libdns interfaces for the [DNSPOD API](https://www.dnspod.cn/docs/index.html) (using the Go implementation from: https://github.com/nrdcg/dnspod-go)
